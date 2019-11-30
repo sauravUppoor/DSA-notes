@@ -20,5 +20,10 @@ int main() {_
 	tc(t) {
 		
 	}
+	//Running time check
+	//auto t2 = chrono::high_resolution_clock::now();
 
+	//auto duration = chrono::duration_cast<std::chrono::microseconds>( t2 - t1 ).count();
+
+	//cout << duration <<" ms";
 }
