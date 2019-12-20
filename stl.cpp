@@ -39,6 +39,18 @@ void vectorDemo() {
 }
 
 void setDemo() {
+	/*SET is used when:
+	Consider we need a container with the following features:
+
+		add an element, but do not allow duples [duplicates?] - O(logN)
+
+		remove elements - O(logN)
+
+		get count of elements (distinct elements) -  O(1)
+
+		check whether elements are present in set - O(logN)
+	*/
+	
 	set<int> S;
 	S.insert(1);
 	S.insert(3);
