@@ -8,7 +8,18 @@ const long long INT_MAX = 1e5 + 10;
 using namespace std;
 
 void vectorDemo() {
-	//Vector
+// 	std::vector      
+
+// 	NOTES:
+// 	1. std::vector is a sequence container and also known as Dynamic Array or Array List.
+// 	2. Its size can grow and shrink dynamically, and no need to provide size at compile time.
+
+// 	ELEMENT ACCESS
+// 	at(), [], front(), back(), data()
+
+// 	MODIFIERS:
+// 	insert(), emplace(), push_back(), emplace_back(), pop_back(), resize(), swap(), erase(), clear()
+	
 	vector<int> A = {1, 2, 3, 8, 4, 9, 10, 0};
 	sort(A.begin(), A.end());
 	
