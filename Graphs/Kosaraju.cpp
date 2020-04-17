@@ -6,11 +6,11 @@ vector<vector<int> > comp;
 void search1(int u) {
 	if(vis[u]) return;
 	vis[u] = 1;
-	order.pb(u);
 
 	for(auto v:adj[u]) {
 		search1(v);
 	}
+	order.pb(u);
 }
 
 void search2(int u) {
