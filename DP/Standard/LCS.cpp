@@ -2,7 +2,7 @@
 // Naive - O(2^n) generating all subsequences
 // DP - O(n^2)
 
-//Recursive
+//Recursive - Worst Case : n * m function calls
 
 int t[1000][1000];
 string x,y;
