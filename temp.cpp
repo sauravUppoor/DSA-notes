@@ -23,6 +23,8 @@ typedef vector<pll> vpll;
 #define pb push_back
 #define tc(t) int t; cin >> t; while(t--)
 #define _ ios_base::sync_with_stdio(false); cin.tie(NULL);
+#define D1(x) { cerr << " [" << #x << ": " << x << "]\n"; }
+#define D2(x) { cerr << " [" << #x << ": "; for(auto it:x) cerr << it << " "; cerr << "]\n"; }
 
 const ll MOD = 1e9 + 7;
 const ll MAXN = 1e6 + 7;
