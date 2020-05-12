@@ -55,7 +55,7 @@ void sieve() {
 	for(int i = 2; i*i <= MAXN; ++i) {
 		if(primes[i] == -1) {
 			for(int j = i*i; j <= MAXN; j += i)
-				primes[j] = i;
+				if(primes[i] == -1) primes[j] = i;
 
 		}
 	}
