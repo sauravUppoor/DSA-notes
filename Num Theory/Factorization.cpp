@@ -52,9 +52,9 @@ int main() {_
 void sieve() {
 	memset(primes, -1, sizeof(primes));
 
-	for(int i = 2; i*i <= MAXN; ++i) {
+	for(int i = 2; i <= MAXN; ++i) {
 		if(primes[i] == -1) {
-			for(int j = i*i; j <= MAXN; j += i)
+			for(int j = i; j <= MAXN; j += i)
 				if(primes[i] == -1) primes[j] = i;
 
 		}
