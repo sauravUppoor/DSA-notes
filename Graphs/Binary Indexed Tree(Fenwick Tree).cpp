@@ -25,5 +25,13 @@ struct BIT {
 			sum += bit[i];
 			i -= i&-i;
 		}
+		return sum;
+	}
+
+	int rsum(int l, int r) {
+		return pref(r) - pref(l-1);
 	}
 };
+
+// http://usaco.org/index.php?page=viewproblem2&cpid=91
+// https://open.kattis.com/problems/moviecollection
