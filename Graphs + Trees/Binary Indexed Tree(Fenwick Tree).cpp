@@ -31,6 +31,18 @@ struct BIT {
 	int rsum(int l, int r) {
 		return pref(r) - pref(l-1);
 	}
+	
+	int lower(int k) {
+		int cur = 0, sum = 0;
+
+		F0Rd(i, log2(size)+1) {
+			if(bit[cur + (1<<i)] + sum < k) {
+				cur += 1<<i;
+				sum +=bit[cur];
+			}
+		}
+		return cur+1;
+	}
 };
 
 // http://usaco.org/index.php?page=viewproblem2&cpid=91
