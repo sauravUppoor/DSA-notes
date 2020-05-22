@@ -7,9 +7,9 @@ struct BIT {
 	int size;
 	vi bit;
 
-	BIT(int n) {
+	void init(int n) {
 		size = n;
-		bit.assign(0, size);
+		bit.assign(size+1, 0);
 	}
 
 	void update(int i, int delta) { 
