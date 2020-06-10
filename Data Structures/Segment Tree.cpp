@@ -1,4 +1,4 @@
-// Segment Tree
+// Rgment Tree
 
 // Operations:
 // Increment / Range update: Change the value of a range [l...r] of an array- O(logN)
@@ -8,83 +8,110 @@
 
 int ar[MAXN];
 
-struct segTree {
+struct RgTree {
 	int n;
-	vi ss, se, minn, delta;
+	vi L, R, st, delta;
 
 
-	segTree(int N) : n(N), ss(4*n+5), se(4*n+5), minn(4*n+5), delta(4*n+5) {buildTree(1,0,n-1);}
+	RgTree(int N) : n(N), L(4*n+5), R(4*n+5), st(4*n+5), delta(4*n+5) {buildTree(1,0,n-1);}
 
 	void buildTree(int i, int qs, int qe) {
-		ss[i]=qs;
-		se[i]=qe;
+		L[i]=qs;
+		R[i]=qe;
 
-		if(qs == qe) {minn[i] = ar[qs]; return;}
+		if(qs == qe) {st[i] = ar[qs]; return;}
 
 		int mid = (qs+qe)/2;
 
 		buildTree(2*i, qs, mid);
 		buildTree(2*i+1, mid+1, qe);
 
-		minn[i] = min(minn[2*i], minn[2*i+1]);
+		st[i] = min(st[2*i], st[2*i+1]);
 	}
 
-	void prop(int i) { 
-		//Propagate the lazy delta down to its left and right nodes
+	void prop(int i) {
 		delta[2*i] += delta[i];
 		delta[2*i+1] += delta[i];
 		delta[i] = 0;
 	}
 
 	void update(int i) {
-		// Updating the minimum value of the segments
-		minn[i] = min(minn[2*i]+delta[2*i], minn[2*i+1]+delta[2*i+1]);
+		st[i] = min(st[2*i]+delta[2*i], st[2*i+1]+delta[2*i+1]);
 	}
 
-	// Query 1 - update a range
-	void increment(int i, int qs, int qe, int val) {
-		if(qe < ss[i] || qs > se[i]) // Node completely out of the range we need
+	int pQuery(int i, int L, int R, int qi) {
+		if(L==R) return st[i];
+
+		int mid = (L+R)/2;
+		if(qi<=mid) return pQuery(2*i, L, mid, qi);
+		else return pQuery(2*i+1, mid+1, R, qi);
+	}
+
+	int Query(int i, int L, int R, int qs, int qe) {
+		if(qe < L || qs > R) {
+			return INT_MAX;
+		}
+
+		if(qs <= L && qe >= R) {
+			
+			return st;
+		}
+
+		int mid = (L+R)/2;
+		int left = minimum(2*i, L, mid, qs, qe);
+		int right = minimum(2*i+1, mid+1, R, qs, qe);
+
+		return min(left, right);
+	}
+
+	void pUpdate(int i, int L, int R, int qi) {
+		if(L == R) {
+			st[i] = ar[L];
+			return;
+		}
+
+		int mid = (L+R)/2;
+		if(qi <= mid) ptupdate(2*i, L, mid, qi);
+		else ptupdate(2*i+1, mid+1, R, qi);
+
+		st[i] = min(st[2*i], st[2*i+1]);
+	}
+
+	void Update(int i, int L, int R, int qs, int qe, int val) {
+		if(qe < L || qs > R) 
 			return;
 
-		if(qs <= ss[i] && qe >= se[i]) {
-			// Node completely in the range we need
+		if(qs <= L && qe >= R) {
 			delta[i] += val;
 			return;
 		}
 
-		// Partially covered case, need to dive inside
 		prop(i);
 
-		increment(2*i, qs, qe, val);
-		increment(2*i+1, qs, qe, val);
+		int mid = (L + R)/2;
+		increment(2*i, L, mid, qs, qe, val);
+		increment(2*i+1, mid+1, R, qs, qe, val);
 
 		update(i);
 	}
 
-	// Query 2 - Find minimum in a range
-	int minimum(int i, int qs, int qe) {
-		if(qe < ss[i] || qs > se[i]) {
-
-			// Node completely out of our range so wsele finding the minimum we return a large value
-			return INT_MAX;
-		}
-
-		if(qs <= ss[i] && qe >= se[i]) {
-			// Node completely in the range we need, so we return the min value and the delta at that position in case there is some
-			return minn[i];
-		}
-
-		//partially covered case, we need to dive more inside
-		prop(i);
-
-		int minleft = minimum(2*i, qs, qe);
-		int minright = minimum(2*i+1, qs, qe);
-
-		update(i);
-
-		return min(minleft, minright);
+	void update(int pos, int val) {
+		pUpdate(1, 1, n, pos, val);
 	}
+
+	void update(int l, int r, int val) {
+		Update(1, 1, n, l, r, val)
+	}
+
+	int query(int pos) {
+		return pQuery(1, 1, n, pos);
+	}
+	int query(int l, int r) {
+		return Query(1, 1, n, l, r);
+	}
+
+
 };
 
-//https://codeforces.com/problemset/problem/52/C
+//https://codeforces.com/problemRt/problem/52/C
 //https://codeforces.com/contest/356/problem/A
