@@ -1,19 +1,21 @@
-// Rgment Tree
+// segment Tree
 
 // Operations:
-// Increment / Range update: Change the value of a range [l...r] of an array- O(logN)
-// RMQ: Find the minimum or maximum of a range - O(logN)
+// 1. pUpdate - update just a position in the array
+// 2. Update - update a range in the array
+// 3. pQuery - get the min/max or other details of a particular postion in the array
+// 4. Query - get the information about a particular range in the array
 
 // Lazy propagation: We store the value of deltas of each and node and only propagate them to their children when we explore the children when need be.
 
 int ar[MAXN];
 
-struct RgTree {
+struct segTree {
 	int n;
 	vi L, R, st, delta;
 
 
-	RgTree(int N) : n(N), L(4*n+5), R(4*n+5), st(4*n+5), delta(4*n+5) {buildTree(1,0,n-1);}
+	segTree(int N) : n(N), L(4*n+5), R(4*n+5), st(4*n+5), delta(4*n+5) {buildTree(1,0,n-1);}
 
 	void buildTree(int i, int qs, int qe) {
 		L[i]=qs;
@@ -29,15 +31,6 @@ struct RgTree {
 		st[i] = min(st[2*i], st[2*i+1]);
 	}
 
-	void prop(int i) {
-		delta[2*i] += delta[i];
-		delta[2*i+1] += delta[i];
-		delta[i] = 0;
-	}
-
-	void update(int i) {
-		st[i] = min(st[2*i]+delta[2*i], st[2*i+1]+delta[2*i+1]);
-	}
 
 	int pQuery(int i, int L, int R, int qi) {
 		if(L==R) return st[i];
@@ -86,13 +79,12 @@ struct RgTree {
 			return;
 		}
 
-		prop(i);
-
 		int mid = (L + R)/2;
 		increment(2*i, L, mid, qs, qe, val);
 		increment(2*i+1, mid+1, R, qs, qe, val);
 
-		update(i);
+		st[i] = min(st[2*i], st[2*i+1]);
+
 	}
 
 	void update(int pos, int val) {
