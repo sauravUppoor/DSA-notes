@@ -12,14 +12,11 @@ int ar[MAXN];
 
 struct segTree {
 	int n;
-	vi L, R, st, delta;
+	vi st, lazy;
 
-
-	segTree(int N) : n(N), L(4*n+5), R(4*n+5), st(4*n+5), delta(4*n+5) {buildTree(1,0,n-1);}
+	segTree(int N) : n(N) st(4*n+5), lazy(4*n+5) {buildTree(1,0,n-1);}
 
 	void buildTree(int i, int qs, int qe) {
-		L[i]=qs;
-		R[i]=qe;
 
 		if(qs == qe) {st[i] = ar[qs]; return;}
 
@@ -28,7 +25,7 @@ struct segTree {
 		buildTree(2*i, qs, mid);
 		buildTree(2*i+1, mid+1, qe);
 
-		st[i] = min(st[2*i], st[2*i+1]);
+		st[i] = (st[2*i] + st[2*i+1]);
 	}
 
 
@@ -41,6 +38,13 @@ struct segTree {
 	}
 
 	int Query(int i, int L, int R, int qs, int qe) {
+
+		if(lazy[i]) {
+			st[i] = lazy[i] * (R-L+1);
+			if(L!=R) lazy[2*i] += lazy[i], lazy[2*i+1] = lazy[i];
+			lazy[i] = 0;
+		}
+
 		if(qe < L || qs > R) {
 			return INT_MAX;
 		}
@@ -51,10 +55,10 @@ struct segTree {
 		}
 
 		int mid = (L+R)/2;
-		int left = minimum(2*i, L, mid, qs, qe);
-		int right = minimum(2*i+1, mid+1, R, qs, qe);
+		int left = Query(2*i, L, mid, qs, qe);
+		int right = Query(2*i+1, mid+1, R, qs, qe);
 
-		return min(left, right);
+		return left + right;
 	}
 
 	void pUpdate(int i, int L, int R, int qi) {
@@ -67,15 +71,23 @@ struct segTree {
 		if(qi <= mid) ptupdate(2*i, L, mid, qi);
 		else ptupdate(2*i+1, mid+1, R, qi);
 
-		st[i] = min(st[2*i], st[2*i+1]);
+		st[i] = (st[2*i] + st[2*i+1]);
 	}
 
 	void Update(int i, int L, int R, int qs, int qe, int val) {
+
+		if(lazy[i]) {
+			st[i] = lazy[i] * (R-L+1); //Range sum
+			if(L!=R) lazy[2*i] += lazy[i], lazy[2*i+1] = lazy[i];
+			lazy[i] = 0;
+		}
+
 		if(qe < L || qs > R) 
 			return;
 
 		if(qs <= L && qe >= R) {
-			delta[i] += val;
+			st[i] += (R-L+1) * val;
+			if(L != R) lazy[2*i] += val, lazy[2*i+1] += val;
 			return;
 		}
 
@@ -83,7 +95,7 @@ struct segTree {
 		increment(2*i, L, mid, qs, qe, val);
 		increment(2*i+1, mid+1, R, qs, qe, val);
 
-		st[i] = min(st[2*i], st[2*i+1]);
+		st[i] = (st[2*i] + st[2*i+1]);
 
 	}
 
