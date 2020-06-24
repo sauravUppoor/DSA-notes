@@ -92,8 +92,8 @@ struct segTree {
 		}
 
 		int mid = (L + R)/2;
-		increment(2*i, L, mid, qs, qe, val);
-		increment(2*i+1, mid+1, R, qs, qe, val);
+		Update(2*i, L, mid, qs, qe, val);
+		Update(2*i+1, mid+1, R, qs, qe, val);
 
 		st[i] = (st[2*i] + st[2*i+1]);
 
