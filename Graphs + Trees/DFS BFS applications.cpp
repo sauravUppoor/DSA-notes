@@ -42,7 +42,7 @@ void kahn(int n) {
 	}
 
 	if(res.size() == n) for(auto x: res) cout << x << ' ';
-	else cout << "Sandro fails.";
+	else cout << "Cycle Exists";
 }
 
 void solve() {
