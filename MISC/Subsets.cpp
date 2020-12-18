@@ -1,12 +1,11 @@
-// Finding all subsets of an array
+/* Finding all subsets of a given array/string
+   Complexity - O(2^n * n)
+*/
 
-
-for(int b = 0; b < (1<<n); ++b) {
-	vi sb;
-	
-	F0R(i,n) {
-		if(b&(1<<i)) sb.pb(a[i]);
+for(int i = 0; i < (1<<n); i++) {
+	vector<int> subset;
+	for(int j = 0; j < n; j++) {
+		if(i&(1<<j)) subset.pb(a[j]);
 	}
-	//vector sb will contain all the elements in the current subset
+	// Evaluate this subset
 }
-
