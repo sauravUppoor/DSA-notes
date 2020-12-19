@@ -1,86 +1,56 @@
-//Brute force:
+/* Finding prime factors with count of a number
+   Complexity - O(sqrt(n))
+*/
 
-void factorize(int n) {
-	for(int p = 2; p <= n; ++p) {
-		int e = 0;
-		while(n%p == 0) {
-			n /= p;
-			++e;
+vector<pii> factorize(int n) {
+	vector<pii> f;
+	// finding smallest prime dividing n
+	for (int i = 2; i * i <= n; i++) {
+		// cnt be the number of time this prime i divides n
+		int cnt = 0;
+		int val = 1;
+		while (n % i == 0) {
+			val = i;
+			cnt++;
+			n /= i;
 		}
-
-		if(e > 0) {
-			printf("%d^%d\n", p, e);
-		}
+		if (val != 1) f.pb({val, cnt});
 	}
-	
-	assert(n == 1);
+	if (n > 1) f.pb({n, 1});
+	return f;
 }
+// -------------------------------------------------------------------------------------------------
+/* To answer queries and get prime factors -
+   1. Precompute spf (smallest prime factor) in O(NloglogN)
+   2. Get prime factors in O(logN)
+*/
+const ll N = 1000000;
+int spf[N];
 
-//________________________________________________________________
-//LogN approach:
-//Better if you want to keep count of particular prime factors occuring in factorization
-//Less memory space
-
-void factorize_efficient(int n) {
-	for(int p = 2; p*p < n; ++p) {
-		int e = 0;
-		while(n%p == 0) {
-			n /= p;
-			++e;
-		}
-
-		if(e > 0) {
-			printf("%d^%d\n", p, e);
-		}
-	}
-	if(n > 1) {
-		printf("%d^%d", n, 1);
-		
-		n /= n;
-	}
-	assert(n == 1);
-}
-	
-int main() {_
-	factorize(30);
-	factorize_efficient(90);
-}
-
-//________________________________________________________
-
-//Sieve approach:
+// computing spf for 1 to N in O(NloglogN)
 void sieve() {
-	memset(primes, -1, sizeof(primes));
-
-	for(int i = 2; i <= MAXN; ++i) {
-		if(primes[i] == -1) {
-			for(int j = i; j <= MAXN; j += i)
-				if(primes[i] == -1) primes[j] = i;
-
+	for (int i = 2; i * i <= N; i++) {
+		if (spf[i] == 0) { // i is a prime
+			spf[i] = i;
+			for (int j = i * i; j <= N; j += i) {
+				if (spf[j] == 0)
+					spf[j] = i;
+			}
 		}
 	}
 }
 
-void factorize_sieve(int n) {
-	vi factors;
-	
-	while(n > 1) {
-		if(primes[n] == -1) {
-			factors.pb(n);
-			n = 1;
-		}
-		else {
-			factors.pb(primes[n]);
-			n /= primes[n];
-		}
+// factorize in O(logN)
+vector<pii> factorize(int n) {
+	vector<pii> f;
+	map<int, int> mp;
+	// finding smallest prime dividing n in O(1)
+	while (n != 1) {
+		mp[spf[n]]++;
+		n /= spf[n];
 	}
-	for(auto x: factors) cout << x << " ";
-	cout << "\n";
+	for (auto x : mp)
+		f.pb({x.F, x.S});
+	return f;
 }
 
-void solve() {
-	int n;
-	cin >> n;
-
-	factorize_sieve(n);
-}
