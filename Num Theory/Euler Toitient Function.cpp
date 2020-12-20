@@ -8,7 +8,7 @@
 */
 
 /*  Finding ETF of a particular number
-    Ccomplexity - O(sqrt(n))
+    Complexity - O(sqrt(n))
 */
 
 int phi(int n) {
@@ -28,3 +28,28 @@ int phi(int n) {
 }
 
 // -------------------------------------------------------------
+
+/* For finding ETF of numbers from 1 to N, above method will take N*sqrt(N) time.
+   We can use sieve and precompute ETF for all the numbers.
+   Complexity -
+   Precompute - O(NloglogN)
+   Query - O(1)
+*/
+
+const ll N = 1000000;
+int phi[N];
+
+void sieve() {
+	for (int i = 1; i <= N; i++)
+		phi[i] = i;
+
+	for (int i = 2; i * i <= N; i++) {
+		if (phi[i] == i) {
+			for (int j = i; j * j <= N; j += i) {
+				phi[j] /= i;
+				phi[j] *= (i - 1);
+			}
+		}
+	}
+}
+    
