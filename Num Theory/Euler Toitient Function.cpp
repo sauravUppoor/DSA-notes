@@ -32,7 +32,7 @@ int phi(int n) {
 /* For finding ETF of numbers from 1 to N, above method will take N*sqrt(N) time.
    We can use sieve and precompute ETF for all the numbers.
    Complexity -
-   Precompute - O(NloglogN)
+   Precompute - O(NlogN)
    Query - O(1)
 */
 
@@ -43,9 +43,9 @@ void sieve() {
 	for (int i = 1; i <= N; i++)
 		phi[i] = i;
 
-	for (int i = 2; i * i <= N; i++) {
+	for (int i = 2; i <= N; i++) {
 		if (phi[i] == i) {
-			for (int j = i; j * j <= N; j += i) {
+			for (int j = i; j <= N; j += i) {
 				phi[j] /= i;
 				phi[j] *= (i - 1);
 			}
