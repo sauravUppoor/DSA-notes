@@ -32,7 +32,7 @@ int phi(int n) {
 /* For finding ETF of numbers from 1 to N, above method will take N*sqrt(N) time.
    We can use sieve and precompute ETF for all the numbers.
    Complexity -
-   Precompute - O(NlogN)
+   Precompute - O(NloglogN)
    Query - O(1)
 */
 
