@@ -38,6 +38,8 @@ void sieve() {
 			}
 		}
 	}
+	for (int i = 0; i <= N; i++)
+		if (spf[i] == 0) spf[i] = i;
 }
 
 // factorize in O(logN)
