@@ -1,121 +1,71 @@
-// segment Tree
+// SegTree
+// Get Range queries of any associative operation
+// eg - Range XOR
 
-// Operations:
-// 1. pUpdate - update just a position in the array
-// 2. Update - update a range in the array
-// 3. pQuery - get the min/max or other details of a particular postion in the array
-// 4. Query - get the information about a particular range in the array
+const ll N = 3e5 + 5;
 
-// Lazy propagation: We store the value of deltas of each and node and only propagate them to their children when we explore the children when need be.
-
-int ar[MAXN];
-
-struct segTree {
-	int n;
-	vi st, lazy;
-
-	segTree(int N) : n(N) st(4*n+5), lazy(4*n+5) {buildTree(1,0,n-1);}
-
-	void buildTree(int i, int qs, int qe) {
-
-		if(qs == qe) {st[i] = ar[qs]; return;}
-
-		int mid = (qs+qe)/2;
-
-		buildTree(2*i, qs, mid);
-		buildTree(2*i+1, mid+1, qe);
-
-		st[i] = (st[2*i] + st[2*i+1]);
+int t[4*N]; // segtree
+int n;
+// v is the current node - 1,2,3,4,...
+// tl,tr is the node range (yellow) - 0,1,2,...,N-1
+// idx is the idx to be updated
+// val is the new value
+void update(int v, int tl, int tr, int idx, int val) {
+	if(tl == idx && tr == idx) {
+		t[v] = t[v]^val;
+		return;
 	}
-
-
-	int pQuery(int i, int L, int R, int qi) {
-		if(L==R) return st[i];
-
-		int mid = (L+R)/2;
-		if(qi<=mid) return pQuery(2*i, L, mid, qi);
-		else return pQuery(2*i+1, mid+1, R, qi);
+	
+	if(tl > idx || tr < idx) {
+		return;
 	}
+	
+	int tm = (tr + tl)/2;
+	update(2*v, tl, tm, idx, val);
+	update(2*v+1, tm+1, tr, idx, val);
+	t[v] = t[2*v] ^ t[2*v+1];
+	return;
+}
 
-	int Query(int i, int L, int R, int qs, int qe) {
-
-		if(lazy[i]) {
-			st[i] = lazy[i] * (R-L+1);
-			if(L!=R) lazy[2*i] += lazy[i], lazy[2*i+1] = lazy[i];
-			lazy[i] = 0;
-		}
-
-		if(qe < L || qs > R) {
-			return INT_MAX;
-		}
-
-		if(qs <= L && qe >= R) {
-			
-			return st;
-		}
-
-		int mid = (L+R)/2;
-		int left = Query(2*i, L, mid, qs, qe);
-		int right = Query(2*i+1, mid+1, R, qs, qe);
-
-		return left + right;
+// l,r is the range query (green)
+int query(int v, int tl, int tr, int l, int r) {
+	// no overlap
+	if(tl > r || tr < l) {
+		return 0;
 	}
-
-	void pUpdate(int i, int L, int R, int qi) {
-		if(L == R) {
-			st[i] = ar[L];
-			return;
-		}
-
-		int mid = (L+R)/2;
-		if(qi <= mid) ptupdate(2*i, L, mid, qi);
-		else ptupdate(2*i+1, mid+1, R, qi);
-
-		st[i] = (st[2*i] + st[2*i+1]);
+	
+	// fully within
+	if(l <= tl && tr <= r) { //l...tl...tr....r
+		return t[v];
 	}
-
-	void Update(int i, int L, int R, int qs, int qe, int val) {
-
-		if(lazy[i]) {
-			st[i] = lazy[i] * (R-L+1); //Range sum
-			if(L!=R) lazy[2*i] += lazy[i], lazy[2*i+1] = lazy[i];
-			lazy[i] = 0;
-		}
-
-		if(qe < L || qs > R) 
-			return;
-
-		if(qs <= L && qe >= R) {
-			st[i] += (R-L+1) * val;
-			if(L != R) lazy[2*i] += val, lazy[2*i+1] += val;
-			return;
-		}
-
-		int mid = (L + R)/2;
-		Update(2*i, L, mid, qs, qe, val);
-		Update(2*i+1, mid+1, R, qs, qe, val);
-
-		st[i] = (st[2*i] + st[2*i+1]);
-
-	}
-
-	void update(int pos, int val) {
-		pUpdate(1, 1, n, pos, val);
-	}
-
-	void update(int l, int r, int val) {
-		Update(1, 1, n, l, r, val)
-	}
-
-	int query(int pos) {
-		return pQuery(1, 1, n, pos);
-	}
-	int query(int l, int r) {
-		return Query(1, 1, n, l, r);
-	}
-
-
-};
-
-//https://codeforces.com/problemRt/problem/52/C
-//https://codeforces.com/contest/356/problem/A
+	
+	// partial overlap - go deeper
+	int tm = (tr + tl)/2;
+	int ans = 0;
+	ans = query(2*v, tl, tm, l, r);
+	ans ^= query(2*v+1, tm+1, tr, l , r);
+	return ans;
+}
+void solve() {
+	 // update(1,0,N-1,2,5);
+	 // update(1,0,N-1,3,6);
+	 // cout << query(1,0,N-1,2,3);
+	 int q;
+	 cin >> n >> q;
+	 for(int i = 0; i < n; i++) {
+	 	int x; cin >> x;
+	 	update(1,0,N-1,i+1,x);
+	 }
+	 
+	 for(int i = 0; i < q; i++) {
+	 	int t, x, y;
+	 	cin >> t >> x >> y;
+	 	if(t == 1) {
+	 		update(1,0,N-1,x,y);
+	 	}
+	 	else {
+	 		cout << query(1,0,N-1,x,y) << '\n';
+	 	}
+	 }
+	 
+}
