@@ -20,24 +20,26 @@ void pathRestore(int s, int t) { // restores path, here s = source t= sink
 	for(auto x: path) cout << x << " ";
 }
 
-distance[s] = 0; // starting node s
-pq.push({0, s});
-while (!pq.empty()) {
-    int a = pq.top().second; pq.pop();
-    
-    if (vis[a]) continue;
-    vis[a] = 1;
-    
-    for (auto u : adj[a]) {
-        int b = u.first, w = u.second;
-        
-        if (distance[a] + w < distance[b]) {
-            distance[b] = distance[a] + w;
-            q.push({-distance[b], b});
-        }
-    }
-    
-    pathRestore(s, t);
+int main()
+{
+	distance[s] = 0; // starting node s
+	pq.push({0, s});
+	while (!pq.empty()) {
+	    int a = pq.top().second; 
+	    int val = pq.first();
+	    pq.pop();
+	    if(val != dist[a]) continue;
+
+	    for (auto u : adj[a]) {
+		int b = u.first, w = u.second;
+
+		if (dist[a] + w < dist[b]) {
+		    dist[b] = dist[a] + w;
+		    pq.push({-dist[b], b});
+		}
+	    }
+
+	    pathRestore(s, t);
 }
 
 // https://www.spoj.com/problems/HIGHWAYS/
