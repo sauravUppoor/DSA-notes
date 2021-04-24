@@ -21,6 +21,10 @@
     - Generating subsets
     - Generating Permutations
 - Sorting
+    - Bubble Sort
+    - Insertion Sort
+    - Quick Sort
+    - Selection Sort
     - Merge Sort
 - Number Theory
     - Binary + Matrix Exponentiation
