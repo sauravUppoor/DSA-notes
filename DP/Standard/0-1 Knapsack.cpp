@@ -1,6 +1,7 @@
 /* 0-1 Knapsack problem
    Given a list of n items and a pair(wli,vi) weight and value pair associated with each pair
    We have to find the maximum value of items that can be choosen with max permissible weight of w.
+   [Point to note - We have arrays list and a weight/val limie ==> Knapsack could be applicable]
 */
 
 /* Recursive / Top down
