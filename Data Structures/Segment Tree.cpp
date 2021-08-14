@@ -6,6 +6,7 @@
 // for STATIC Range queries - Use DP
 // Build: O(nlogn)
 // Query: O(1)
+
 #include <bits/stdc++.h>
 using namespace std;
 
@@ -66,7 +67,9 @@ public:
 	SegmentTree(const vector<int> &A) {
 		n = A.size();
 		t.assign(n, INIT_VAL);
+		
 		for(int i = 0; i < n; ++i) {
+			cerr << A[i] << ' ';
 			update(1, 0, n-1, i+1, A[i]);
 		}
 	}
@@ -145,9 +148,8 @@ int32_t main() {
 	 // }
 	 
 	vector<int> A = { 18, 17, 13, 19, 15, 11, 20 }; // the original array
-	// vector<int> A(arr, arr + 7);
 	SegmentTree st(A);
-	printf("RMQ(1, 3) = %d\n", st.query(1, 3)); // answer = index 2
-	printf("RMQ(4, 6) = %d\n", st.query(4, 6));
+	// printf("RMQ(1, 3) = %d\n", st.query(1, 3)); // answer = index 2
+	// printf("RMQ(4, 6) = %d\n", st.query(4, 6));
 	st.displayTree();
 }
