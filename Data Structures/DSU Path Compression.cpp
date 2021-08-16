@@ -1,19 +1,46 @@
-int par[MAXN], ans; //par initially -1
- 
-int find(int a) { //Path compression
-	if(par[a] < 0) return a;
-	else return par[a] = find(par[a]);
-}
- 
-// Variation 1: Keeping count of children of a node in a set
-void _union(int a, int b) {
-	par[a] += par[b]; // Keeps track of all the children of a par node, negative in value
-	par[b] = a;
-}
+class DSU
+{
+public:
+	int connected;
+	vector<int> par, sz;
 
-//Variation 2: Minimum node value in a set
-void _union(ll a, ll b) {
-	par[a] = min(par[a], par[b]);
-	par[b] = a;
-}
+	void init(int n) 
+	{
+		par = sz = vector<int> (n + 1, 0);
+		for(int i = 1; i <= n; i++)
+			par[i] = i, sz[i] = 1;
+		connected = n;
+	}
 
+	int getPar(int u)
+	{
+		while(u != par[u])
+		{
+			par[u] = par[par[u]];
+			u = par[u];
+		}
+		return u;
+	}
+
+	int getSize(int u)
+	{
+		return sz[getPar(u)];
+	}
+
+	void merge(int u, int v)
+	{
+		int par1 = getPar(u), par2 = getPar(v);
+
+		if(par1 == par2)
+			return;
+
+		connected--;
+
+		if(sz[par1] > sz[par2])
+			swap(par1, par2);
+
+		sz[par2] += sz[par1];
+		sz[par1] = 0;
+		par[par1] = par[par2];
+	}
+};
