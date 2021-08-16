@@ -15,141 +15,166 @@ typedef long long ll;
 const ll N = 3e5 + 5;
 const ll INF = 1e18;
 
-class SegmentTree {
-private: 
-	vector<int> t;
-	int n;
-	int INIT_VAL = INF;
-	
-	int operation(int a, int b) {
-		return min(a,b);	
+struct data
+{
+	//Use required attributes
+	int mn;
+
+	//Default Values
+	data() : mn(1e9) {};
+};
+
+class SegTree
+{
+	public:
+	int N;
+	vector<data> st;
+	vector<bool> cLazy;
+	vector<int> lazy;
+
+	void init(int n)
+	{
+		N = n;
+		st.resize(4 * N + 5);
+		cLazy.assign(4 * N + 5, false);
+		lazy.assign(4 * N + 5, 0);
+	}
+
+	//Write reqd merge functions
+	void merge(data &cur, data &l, data &r) 
+	{
+		cur.mn = min(l.mn, r.mn);
 	}
 	
-	// v is the current node - 1,2,3,4,...
-	// tl,tr is the tree range - 0,1,2,...,N-1
-	// idx is the idx to be updated
-	// val is the new value
-	void update(int node, int tl, int tr, int idx, int val) {
-		if(tl == idx && tr == idx) {
-			t[node] = min(t[node], val);
+	//Handle lazy propagation appriopriately
+	void propagate(int node, int L, int R)
+	{
+		if(L != R)
+		{
+			cLazy[node*2] = 1;
+			cLazy[node*2 + 1] = 1;
+			lazy[node*2] = lazy[node];
+			lazy[node*2 + 1] = lazy[node]; 
+		}
+		if(st[node].mn == 1e9) st[node].mn = lazy[node];
+		else st[node].mn += lazy[node];
+		cLazy[node] = 0;
+	}
+
+	void build(int node, int L, int R)
+	{
+		if(L==R)
+		{
+			st[node].mn = 1e9;
 			return;
 		}
-		
-		if(tl > val || tr < val) { return; }
-		
-		int tm = (tl + tr)/2;
-		update(2*node, tl, tm, idx, val);
-		update(2*node, tm+1, tr, idx, val);
-		
-		t[node] = operation(t[2*node], t[2*node+1]);
-		return;
+		int M=(L + R)/2;
+		build(node*2, L, M);
+		build(node*2 + 1, M + 1, R);
+		merge(st[node], st[node*2], st[node*2+1]);
 	}
-	
-	// l,r is the range query
-	int query(int node, int tl, int tr, int l, int r) {
-		// no overlap
-		if(tl > r || tr < l ) { return 0; }
-		
-		// fully within
-		if(tl >= l && tr <= r) {
-			return t[node];
-		}
-		
-		// partially
-		int tm = (tl + tr)/2;
-		int ql = query(2*node, tl, tm, l, r);
-		int qr = query(2*node+1, tm+1, tr, l, r);
-		int ans = operation(ql, qr);
-		return ans;
+
+	data Query(int node, int L, int R, int i, int j)
+	{
+		if(cLazy[node])
+			propagate(node, L, R);
+		if(j<L || i>R)
+			return data();
+		if(i<=L && R<=j)
+			return st[node];
+		int M = (L + R)/2;
+		data left=Query(node*2, L, M, i, j);
+		data right=Query(node*2 + 1, M + 1, R, i, j);
+		data cur;
+		merge(cur, left, right);
+		return cur;
 	}
-	
-public:
-	SegmentTree(const vector<int> &A) {
-		n = A.size();
-		t.assign(n, INIT_VAL);
-		
-		for(int i = 0; i < n; ++i) {
-			cerr << A[i] << ' ';
-			update(1, 0, n-1, i+1, A[i]);
+
+	data pQuery(int node, int L, int R, int pos)
+	{
+		if(cLazy[node])
+			propagate(node, L, R);
+		if(L == R)
+			return st[node];
+		int M = (L + R)/2;
+		if(pos <= M)
+			return pQuery(node*2, L, M, pos);
+		else
+			return pQuery(node*2 + 1, M + 1, R, pos);
+	}	
+
+	void Update(int node, int L, int R, int i, int j, int val)
+	{
+		if(cLazy[node])
+			propagate(node, L, R);
+		if(j<L || i>R)
+			return;
+		if(i<=L && R<=j)
+		{
+			cLazy[node] = 1;
+			lazy[node] = val;
+			propagate(node, L, R);
+			return;
 		}
+		int M = (L + R)/2;
+		Update(node*2, L, M, i, j, val);
+		Update(node*2 + 1, M + 1, R, i, j, val);
+		merge(st[node], st[node*2], st[node*2 + 1]);
 	}
-	
-	void update(int idx, int val) { return update(1, 0, n-1, idx, val); }
-	
-	int query(int i, int j) { return query(1, 0, n-1, i, j); }
-	
-	void displayTree() {
-		for(int i = 0; i < 14; ++i) {
-			cout << t[i] << ' ';
+
+	void pUpdate(int node, int L, int R, int pos, int val)
+	{
+		if(cLazy[node])
+			propagate(node, L, R);
+		if(L == R)
+		{
+			cLazy[node] = 1;
+			lazy[node] = val;
+			propagate(node, L, R);
+			return;
 		}
-		cout << '\n';
+		int M = (L + R)/2;
+		if(pos <= M)
+			pUpdate(node*2, L, M, pos, val);
+		else
+			pUpdate(node*2 + 1, M + 1, R, pos, val);
+		merge(st[node], st[node*2], st[node*2 + 1]);
+	}
+
+	data query(int pos)
+	{
+		return pQuery(1, 1, N, pos);
+	}
+
+	data query(int l, int r)
+	{
+		return Query(1, 1, N, l, r);
+	}
+
+	void update(int pos, int val)
+	{
+		pUpdate(1, 1, N, pos, val);
+	}
+
+	void update(int l, int r, int val)
+	{
+		Update(1, 1, N, l, r, val);
 	}
 };
 
-// int t[4*N]; // segtree
-// int n;
-// 
-// void update(int v, int tl, int tr, int idx, int val) {
-	// if(tl == idx && tr == idx) {
-		// t[v] = t[v]^val;
-		// return;
-	// }
-// 	
-	// if(tl > idx || tr < idx) {
-		// return;
-	// }
-// 	
-	// int tm = (tr + tl)/2;
-	// update(2*v, tl, tm, idx, val);
-	// update(2*v+1, tm+1, tr, idx, val);
-	// t[v] = t[2*v] ^ t[2*v+1];
-	// return;
-// }
-// 
-// 
-// int query(int v, int tl, int tr, int l, int r) {
-	// // no overlap
-	// if(tl > r || tr < l) {
-		// return 0;
-	// }
-// 	
-	// // fully within
-	// if(l <= tl && tr <= r) { //l...tl...tr....r
-		// return t[v];
-	// }
-// 	
-	// // partial overlap - go deeper
-	// int tm = (tr + tl)/2;
-	// int ans = 0;
-	// ans = query(2*v, tl, tm, l, r);
-	// ans ^= query(2*v+1, tm+1, tr, l , r);
-	// return ans;
-// }
 int32_t main() {
-	 // update(1,0,N-1,2,5);
-	 // update(1,0,N-1,3,6);
-	 // cout << query(1,0,N-1,2,3);
-	 // int q;
-	 // cin >> n >> q;
-	 // for(int i = 0; i < n; i++) {
-	 	// int x; cin >> x;
-	 	// update(1,0,N-1,i+1,x);
-	 // }
-// 	 
-	 // for(int i = 0; i < q; i++) {
-	 	// int t, x, y;
-	 	// cin >> t >> x >> y;
-	 	// if(t == 1) {
-	 		// update(1,0,N-1,x,y);
-	 	// }
-	 	// else {
-	 		// cout << query(1,0,N-1,x,y) << '\n';
-	 	// }
-	 // }
-	 
-	vector<int> A = { 18, 17, 13, 19, 15, 11, 20 }; // the original array
-	SegmentTree st(A);
-	// printf("RMQ(1, 3) = %d\n", st.query(1, 3)); // answer = index 2
-	// printf("RMQ(4, 6) = %d\n", st.query(4, 6));
-	st.displayTree();
+	SegTree s;
+	int N; cin >> N;
+	s.init(N);
+	s.build(1, 1, N);
+	vector<int> V(N+1);
+	for(int i = 1; i <= N; ++i) {
+		cin >> V[i];
+		s.update(i, V[i]);
+	}
+	s.update(1, 3, 6);
+	for(int i = 1; i <= 4*N; ++i) {
+		// deb(i, s.st[i].mn);
+	}
+	
 }
